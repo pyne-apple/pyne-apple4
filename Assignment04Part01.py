@@ -28,7 +28,7 @@ def main():
         trainingLists = []
         for line in trainingFile:
             splitValues = list(int(x) for x in line.strip().replace('\t', ''))
-            classLists.append([splitValues[-1]])
+            classLists.append(splitValues[-1])
             splitValues.pop(-1) # Remove class
             trainingLists.append(splitValues)
         # print(classLists)
@@ -40,7 +40,7 @@ def main():
         # print(y)
 
         # Weights
-        weights = [[0.0] * (len(headers)-1)] # All the network weights must be initialized to 0.
+        weights = [[0.5] * (len(headers)-1)] # All the network weights must be initialized to 0.
         weightHeaders = []
         for header in headers:
             if header == "class":
@@ -48,21 +48,26 @@ def main():
             weightHeaders.append("w(" + header + ")")
         # print(weights)
         # print(weightHeaders)
-        weightsNPA = np.array(weights)
-        # print(weightsNPA)
+        w = np.array(weights)
+        # print(w)
         
         # For each iteration 
         for i in range(iterations):
             # print(x[i])
             # print(float(y[i]))
-            # sig = sigmoid(np.dot(weightsNPA, x[i]))
-            crossProduct = np.dot(weightsNPA, x[i])
-            error = float(y[i]) - sigmoid(crossProduct)
-            # print(sigmoid(crossProduct))
-            print(error)
+            # sig = sigmoid(np.dot(w, x[i]))
+            output = np.dot(w, x[i])
+            # print(output)
+            error = float(y[i]) - sigmoid(output)
+            # print(sigmoid(output))
+            # print(error)
             
-            weightsNPA += learningRate * error * weightsNPA * sigmoidPrime(crossProduct)
-            print(weightsNPA)
+            # print(x[i].T)
+            # adjustment = dot(inputs.T, error * self.__sigmoid_derivative(output))
+            w += learningRate * error * x[i].T * sigmoidPrime(output)
+            # print(sigmoidPrime(output))
+            # w += learningRate * np.dot(x[i] * sigmoidPrime(output))
+            print(w)
 
             
             
@@ -102,15 +107,15 @@ def main():
 
 
 # activation function
-def sigmoid(x): 
-    return 1/(1 + np.exp(-x))      
+# def sigmoid(x): 
+#     return 1/(1 + np.exp(-x))      
     
 # derivative of sigmoid
 def sigmoidPrime(x): 
     return x * (1 - x)             
 
-# def sigmoid(x):
-#     return 1 / (1 + math.exp(-x))
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
 
 if __name__ == "__main__":
     main()
