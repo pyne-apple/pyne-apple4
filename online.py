@@ -9,6 +9,12 @@ class NeuralNet(object):
         # Assign random weights to a 3 x 1 matrix,
         self.synaptic_weights = 2 * random.random((13, 1)) - 1
 
+        # self.weightNames = []
+        # for header in headers:
+        #     if header == "class":
+        #         continue
+        #     self.weightNames.append("w(" + header + ")")
+
     # The Sigmoid function
     def __sigmoid(self, x):
         return 1 / (1 + exp(-x))
@@ -19,18 +25,31 @@ class NeuralNet(object):
         return x * (1 - x)
 
     # Train the neural network and adjust the weights each time.
-    def train(self, inputs, outputs, training_iterations):
-        for iteration in range(training_iterations):
+    def train(self, inputs, outputs, training_iterations, headers):
+        for i in range(training_iterations):
         
             # Pass the training set through the network.
             output = self.learn(inputs)
+            # print(output)
 
             # Calculate the error
             error = outputs - output
+            # print(error)
 
             # Adjust the weights
             adjustment = dot(inputs.T, error * self.__sigmoid_derivative(output))
             self.synaptic_weights += adjustment
+            # print(self.synaptic_weights.T)
+
+            weightsPrint = ""
+            for iW, header in enumerate(headers):
+                # print(self.synaptic_weights[iW])
+                if header == "class":
+                    continue
+                weightsPrint += "w(" + header + ")=" + str(round(self.synaptic_weights[iW][0], 4)) + ", ";
+            # print(str(weightsPrint) + " ")
+            print("After iteration " + str(i) + ": " + str(weightsPrint) + "output=" + str(round(output[0][0], 4)))
+            
 
     # The neural network thinks.
     def learn(self, inputs):
@@ -72,16 +91,13 @@ if __name__ == "__main__":
         inputs = array(trainingLists)
         outputs = array(classLists)
         # print(inputs)
-        print(outputs)
+        # print(outputs)
 
         #Initialize the network
         neural_network = NeuralNet()
-        
-        # The training set.
-        # inputs = array([[0, 1, 1], [1, 0, 0], [1, 0, 1]])
-        # outputs = array([[1, 0, 1]]).T
+
         # Train the network
-        neural_network.train(inputs, outputs, 100000)
+        neural_network.train(inputs, outputs, iterations, headers)
 
         # Test the neural network with a test example.
         # print(neural_network.learn(array([1, 0, 1])))
