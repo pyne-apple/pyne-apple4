@@ -1,27 +1,20 @@
 from numpy import *
 import sys
 
-class NeuralNet(object):
+class NN(object):
     def __init__(self):
         # Generate random numbers
-        random.seed(1)
+        # random.seed(1)
 
         # Assign random weights to a 3 x 1 matrix,
-        self.synaptic_weights = 2 * random.random((13, 1)) - 1
+        self.synaptic_weights = zeros((13, 1))
+        # self.synaptic_weights = 2 * random.random((13, 1)) - 1
+        print(self.synaptic_weights)
 
-        # self.weightNames = []
-        # for header in headers:
-        #     if header == "class":
-        #         continue
-        #     self.weightNames.append("w(" + header + ")")
-
-    # The Sigmoid function
-    def __sigmoid(self, x):
+    def _sigmoid(self, x):
         return 1 / (1 + exp(-x))
 
-    # The derivative of the Sigmoid function.
-    # This is the gradient of the Sigmoid curve.
-    def __sigmoid_derivative(self, x):
+    def _sigmoid_derivative(self, x):
         return x * (1 - x)
 
     # Train the neural network and adjust the weights each time.
@@ -37,7 +30,7 @@ class NeuralNet(object):
             # print(error)
 
             # Adjust the weights
-            adjustment = dot(inputs.T, error * self.__sigmoid_derivative(output))
+            adjustment = dot(inputs.T, error * self._sigmoid_derivative(output))
             self.synaptic_weights += adjustment
             # print(self.synaptic_weights.T)
 
@@ -50,11 +43,8 @@ class NeuralNet(object):
             # print(str(weightsPrint) + " ")
             print("After iteration " + str(i) + ": " + str(weightsPrint) + "output=" + str(round(output[0][0], 4)))
             
-
-    # The neural network thinks.
     def learn(self, inputs):
-        return self.__sigmoid(dot(inputs, self.synaptic_weights))
-
+        return self._sigmoid(dot(inputs, self.synaptic_weights))
 
 if __name__ == "__main__":
 
@@ -63,7 +53,7 @@ if __name__ == "__main__":
         # (2) a test file, 
         # (3) a learning rate, and 
         # (4) the number of iterations to run the algorithm.
-        # python experiment.py train2.dat test2.dat 0.3 400
+        # python Assignment04Part01.py train2.dat test2.dat 0.3 400
         print ("Please execute with 4 arguments <Training File> <Test File> <Learning Rate> <#Iterations>")
         exit()
 
@@ -94,7 +84,7 @@ if __name__ == "__main__":
         # print(outputs)
 
         #Initialize the network
-        neural_network = NeuralNet()
+        neural_network = NN()
 
         # Train the network
         neural_network.train(inputs, outputs, iterations, headers)
