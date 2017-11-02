@@ -1,59 +1,17 @@
 from numpy import *
 import sys
 
-class NN(object):
-    def __init__(self):
-        # Generate random numbers
-        # random.seed(1)
+def sigma(t):
+    t = t * -1
+    return float (1/(1+math.pow(2.71828, t)))
 
-        # Assign random weights to a 3 x 1 matrix,
-        self.synaptic_weights = zeros((13, 1))
-        # self.synaptic_weights = 2 * random.random((13, 1)) - 1
-        print(self.synaptic_weights)
+def derivative_sigma(t):
+    sigman = sigma(t)
+    return sigman * (1 - sigman)
 
-    def _sigmoid(self, x):
-        return 1 / (1 + exp(-x))
-
-    def _sigmoid_derivative(self, x):
-        return x * (1 - x)
-
-    # Train the neural network and adjust the weights each time.
-    def train(self, inputs, outputs, training_iterations, headers):
-        for i in range(training_iterations):
-        
-            # Pass the training set through the network.
-            output = self.learn(inputs)
-            # print(output)
-
-            # Calculate the error
-            error = outputs - output
-            # print(error)
-
-            # Adjust the weights
-            adjustment = dot(inputs.T, error * self._sigmoid_derivative(output))
-            self.synaptic_weights += adjustment
-            # print(self.synaptic_weights.T)
-
-            weightsPrint = ""
-            for iW, header in enumerate(headers):
-                # print(self.synaptic_weights[iW])
-                if header == "class":
-                    continue
-                weightsPrint += "w(" + header + ")=" + str(round(self.synaptic_weights[iW][0], 4)) + ", ";
-            # print(str(weightsPrint) + " ")
-            print("After iteration " + str(i) + ": " + str(weightsPrint) + "output=" + str(round(output[0][0], 4)))
-            
-    def learn(self, inputs):
-        return self._sigmoid(dot(inputs, self.synaptic_weights))
 
 if __name__ == "__main__":
-
     if len(sys.argv) != 5:
-        # (1) a training file, 
-        # (2) a test file, 
-        # (3) a learning rate, and 
-        # (4) the number of iterations to run the algorithm.
-        # python Assignment04Part01.py train2.dat test2.dat 0.3 400
         print ("Please execute with 4 arguments <Training File> <Test File> <Learning Rate> <#Iterations>")
         exit()
 
@@ -66,7 +24,6 @@ if __name__ == "__main__":
     with open(trainingFileName) as trainingFile:
         firstLine = trainingFile.readline()
         headers = firstLine.split()
-        # print(headers)
 
         classLists = []
         trainingLists = []
@@ -75,19 +32,80 @@ if __name__ == "__main__":
             classLists.append([splitValues[-1]])
             splitValues.pop(-1) # Remove class
             trainingLists.append(splitValues)
-        # print(classLists)
-        # print(trainingLists)
+        #print(classLists)
+        #print(trainingLists)
 
         inputs = array(trainingLists)
         outputs = array(classLists)
-        # print(inputs)
-        # print(outputs)
+        #print(inputs)
+        #Now we have classlist, eachtraining list and headers (All we need)
+
+
+        #Iterating for the number of trainingData
+        #making a weights matrix initialized to 0
+        w = len(trainingLists)
+        h = len (headers)-1
+        weights = [0 for y in range(h)]
+
+        itr = 1
+        for num in range(iterations//len(trainingLists)):
+            for i in range(len(trainingLists)):
+                #for each training instance
+                print(weights)
+                print(trainingLists[i])
+                print("derivative_sigma: ",derivative_sigma(dot(weights, trainingLists[i])))
+                error = classLists[i][0] - sigma(dot(weights, trainingLists[i]))
+                print("class: ",classLists[i][0])
+                print("error:", error)
+                print("After iteration", itr,": ", end='')
+                #for each attribute in training instance
+                for header in headers:
+                    if header == "class":
+                        continue
+                    weights[headers.index(header)] += (learningRate*error*trainingLists[i][headers.index(header)]*derivative_sigma(dot(weights, trainingLists[i])))
+                    print ("w("+ str(header)+ ") =", round(weights[headers.index(header)], 4), end='')
+                output = sigma(dot(weights, trainingLists[i]))
+                print (" Output = ", round(output, 4))
+                #print(weights)
+                #print(output)
+                itr = itr +1
+                print("-------------------------")
+
+        for i in range(iterations%len(trainingLists)):
+            # for each training instance
+            print(weights)
+            print(trainingLists[i])
+            print("derivative_sigma: ", derivative_sigma(dot(weights, trainingLists[i])))
+            error = classLists[i][0] - sigma(dot(weights, trainingLists[i]))
+            print("class: ", classLists[i][0])
+            print("error:", error)
+            print("After iteration", itr, end='')
+            # for each attribute in training instance
+            for header in headers:
+                if header == "class":
+                    continue
+                weights[headers.index(header)] += (
+                learningRate * error * trainingLists[i][headers.index(header)] * derivative_sigma(
+                    dot(weights, trainingLists[i])))
+                print("w(", str(header), ") =", round(weights[headers.index(header)], 4), end=' ')
+            output = sigma(dot(weights, trainingLists[i]))
+            print("Output = ", round(output, 4))
+            # print(weights)
+            # print(output)
+            itr = itr + 1
+            print("-------------------------HERE")
+
+
+
+
+
+
 
         #Initialize the network
-        neural_network = NN()
+        #neural_network = NN()
 
         # Train the network
-        neural_network.train(inputs, outputs, iterations, headers)
+        #neural_network.train(inputs, outputs, iterations, headers)
 
         # Test the neural network with a test example.
         # print(neural_network.learn(array([1, 0, 1])))
