@@ -2,14 +2,14 @@ from numpy import *
 import sys
 
 def sigma(t):
-    t = t * -1
-    return float (1/(1+math.pow(2.71828, t)))
+    t = t * -1.0
+    return float (1.0/(1.0+math.pow(2.71828, t)))
 
 def derivative_sigma(t):
     sigman = sigma(t)
-    return sigman * (1 - sigman)
+    return sigman * (1.0 - sigman)
 
-
+# python Assignment04Part01.py train2.dat test2.dat 0.3 400 > results.txt
 if __name__ == "__main__":
     if len(sys.argv) != 5:
         print ("Please execute with 4 arguments <Training File> <Test File> <Learning Rate> <#Iterations>")
@@ -28,12 +28,12 @@ if __name__ == "__main__":
         classLists = []
         trainingLists = []
         for line in trainingFile:
-            splitValues = list(int(x) for x in line.strip().replace('\t', ''))
+            splitValues = list(float(x) for x in line.strip().replace('\t', ''))
             classLists.append([splitValues[-1]])
             splitValues.pop(-1) # Remove class
             trainingLists.append(splitValues)
-        #print(classLists)
-        #print(trainingLists)
+        # print(classLists)
+        # print(trainingLists)
 
         inputs = array(trainingLists)
         outputs = array(classLists)
@@ -45,25 +45,28 @@ if __name__ == "__main__":
         #making a weights matrix initialized to 0
         w = len(trainingLists)
         h = len (headers)-1
-        weights = [0 for y in range(h)]
+        weights = [0.0 for y in range(h)]
 
         itr = 1
         for num in range(iterations//len(trainingLists)):
             for i in range(len(trainingLists)):
+                # Keep track of old weights
+                weightsPrev = copy(weights)
                 #for each training instance
                 print(weights)
                 print(trainingLists[i])
-                print("derivative_sigma: ",derivative_sigma(dot(weights, trainingLists[i])))
-                error = classLists[i][0] - sigma(dot(weights, trainingLists[i]))
-                print("class: ",classLists[i][0])
-                print("error:", error)
+                # print("derivative_sigma: ",derivative_sigma(dot(weightsPrev, trainingLists[i])))
+                error = classLists[i][0] - sigma(dot(weightsPrev, trainingLists[i]))
+                # print("class: ",classLists[i][0])
+                # print("error:", error)
                 print("After iteration", itr,": ", end='')
                 #for each attribute in training instance
                 for header in headers:
                     if header == "class":
                         continue
-                    weights[headers.index(header)] += (learningRate*error*trainingLists[i][headers.index(header)]*derivative_sigma(dot(weights, trainingLists[i])))
+                    weights[headers.index(header)] += (learningRate * error * trainingLists[i][headers.index(header)] * derivative_sigma(dot(weightsPrev, trainingLists[i])))
                     print ("w("+ str(header)+ ") =", round(weights[headers.index(header)], 4), end='')
+
                 output = sigma(dot(weights, trainingLists[i]))
                 print (" Output = ", round(output, 4))
                 #print(weights)
@@ -75,10 +78,10 @@ if __name__ == "__main__":
             # for each training instance
             print(weights)
             print(trainingLists[i])
-            print("derivative_sigma: ", derivative_sigma(dot(weights, trainingLists[i])))
+            # print("derivative_sigma: ", derivative_sigma(dot(weights, trainingLists[i])))
             error = classLists[i][0] - sigma(dot(weights, trainingLists[i]))
-            print("class: ", classLists[i][0])
-            print("error:", error)
+            # print("class: ", classLists[i][0])
+            # print("error:", error)
             print("After iteration", itr, end='')
             # for each attribute in training instance
             for header in headers:
